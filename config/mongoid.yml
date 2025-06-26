@@ -4,3 +4,17 @@ development:
       uri: <%= ENV['MONGODB_ATLAS_URI'] %>
   options:
     use_activesupport_time_zone: true
+
+test:
+  clients:
+    default:
+      uri: <%= ENV['MONGODB_ATLAS_URI'] %>
+  options:
+    use_activesupport_time_zone: true
+
+production:
+  clients:
+    default:
+      uri: <%= ENV['MONGODB_ATLAS_URI'] %>
+  options:
+    use_activesupport_time_zone: true
