@@ -22,5 +22,6 @@ group :test do
   gem "database_cleaner-mongoid"
   gem "factory_bot_rails"
   gem "faker"
+  gem "mongoid-rspec"
   gem "rspec-rails"
 end

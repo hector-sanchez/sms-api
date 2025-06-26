@@ -162,6 +162,12 @@ GEM
       concurrent-ruby (>= 1.0.5, < 2.0)
       mongo (>= 2.18.0, < 3.0.0)
       ruby2_keywords (~> 0.0.5)
+    mongoid-compatibility (1.0.0)
+      activesupport
+      mongoid (>= 2.0)
+    mongoid-rspec (4.2.0)
+      mongoid (>= 3.0, < 10.0)
+      mongoid-compatibility (>= 0.5.1)
     msgpack (1.8.0)
     net-http (0.6.0)
       uri
@@ -356,6 +362,7 @@ DEPENDENCIES
   jwt
   kamal
   mongoid (~> 8.1)
+  mongoid-rspec
   puma (>= 5.0)
   rails (~> 8.0.2)
   rspec-rails
