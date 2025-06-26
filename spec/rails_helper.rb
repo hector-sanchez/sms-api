@@ -5,6 +5,7 @@ require_relative '../config/environment'
 # Prevent database truncation if the environment is production
 abort("The Rails environment is running in production mode!") if Rails.env.production?
 require 'rspec/rails'
+require 'mongoid-rspec'
 # Add additional requires below this line. Rails is not loaded until this point!
 
 # Requires supporting ruby files with custom matchers and macros, etc, in
@@ -24,12 +25,17 @@ require 'rspec/rails'
 
 RSpec.configure do |config|
   config.include FactoryBot::Syntax::Methods
+  config.include Mongoid::Matchers, type: :model
 
   config.before(:suite) do
-    DatabaseCleaner.strategy = :truncation
+    DatabaseCleaner[:mongoid].strategy = :deletion
+    DatabaseCleaner[:mongoid].clean_with(:deletion)
   end
+
   config.around(:each) do |example|
-    DatabaseCleaner.cleaning { example.run }
+    DatabaseCleaner[:mongoid].cleaning do
+      example.run
+    end
   end
 
   # Remove this line to enable support for ActiveRecord
@@ -59,7 +65,7 @@ RSpec.configure do |config|
   # behaviour is considered legacy and will be removed in a future version.
   #
   # To enable this behaviour uncomment the line below.
-  # config.infer_spec_type_from_file_location!
+  config.infer_spec_type_from_file_location!
 
   # Filter lines from Rails gems in backtraces.
   config.filter_rails_from_backtrace!
