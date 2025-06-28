@@ -2,11 +2,11 @@ require 'rails_helper'
 
 RSpec.describe 'Auths', type: :request do
   let!(:user) { User.create!(email: 'test@example.com', password: 'password123') }
-  
+
   before do
     # Clear database except for our test user
     User.where.not(id: user.id).delete_all
-    
+
     # Mock environment variable for JWT
     allow(ENV).to receive(:[]).and_call_original
     allow(ENV).to receive(:[]).with('JWT_SECRET').and_return('test_secret_key')
@@ -39,7 +39,7 @@ RSpec.describe 'Auths', type: :request do
         post '/auths', params: valid_params
 
         expect(response).to have_http_status(:ok)
-        
+
         response_body = JSON.parse(response.body)
         expect(response_body).to have_key('token')
         expect(response_body).to have_key('user')
@@ -66,7 +66,7 @@ RSpec.describe 'Auths', type: :request do
         token = response_body['token']
 
         expect(token).to be_present
-        
+
         # Token should be decodable
         expect { JwtService.decode(token) }.not_to raise_error
       end
@@ -77,7 +77,7 @@ RSpec.describe 'Auths', type: :request do
         post '/auths', params: invalid_email_params
 
         expect(response).to have_http_status(:unauthorized)
-        
+
         response_body = JSON.parse(response.body)
         expect(response_body).to have_key('error')
         expect(response_body).to have_key('message')
@@ -90,7 +90,7 @@ RSpec.describe 'Auths', type: :request do
         post '/auths', params: invalid_password_params
 
         expect(response).to have_http_status(:unauthorized)
-        
+
         response_body = JSON.parse(response.body)
         expect(response_body).to have_key('error')
         expect(response_body).to have_key('message')
@@ -103,27 +103,27 @@ RSpec.describe 'Auths', type: :request do
         post '/auths', params: { password: 'password123' }
 
         expect(response).to have_http_status(:unauthorized)
-        
+
         response_body = JSON.parse(response.body)
-        expect(response_body['error']).to eq('Invalid email or password')
+        expect(response_body['error']).to eq('Email and password are required')
       end
 
       it 'returns error for missing password' do
         post '/auths', params: { email: 'test@example.com' }
 
         expect(response).to have_http_status(:unauthorized)
-        
+
         response_body = JSON.parse(response.body)
-        expect(response_body['error']).to eq('Invalid email or password')
+        expect(response_body['error']).to eq('Email and password are required')
       end
 
       it 'returns error for empty parameters' do
         post '/auths', params: {}
 
         expect(response).to have_http_status(:unauthorized)
-        
+
         response_body = JSON.parse(response.body)
-        expect(response_body['error']).to eq('Invalid email or password')
+        expect(response_body['error']).to eq('Email and password are required')
       end
     end
 
@@ -131,26 +131,28 @@ RSpec.describe 'Auths', type: :request do
       it 'handles case-sensitive email' do
         post '/auths', params: { email: 'TEST@EXAMPLE.COM', password: 'password123' }
 
-        expect(response).to have_http_status(:unauthorized)
-        
+        expect(response).to have_http_status(:ok)
+
         response_body = JSON.parse(response.body)
-        expect(response_body['error']).to eq('Invalid email or password')
+        expect(response_body).to have_key('token')
+        expect(response_body['message']).to eq('Authentication successful')
       end
 
       it 'handles extra whitespace in email' do
         post '/auths', params: { email: ' test@example.com ', password: 'password123' }
 
-        expect(response).to have_http_status(:unauthorized)
-        
+        expect(response).to have_http_status(:ok)
+
         response_body = JSON.parse(response.body)
-        expect(response_body['error']).to eq('Invalid email or password')
+        expect(response_body).to have_key('token')
+        expect(response_body['message']).to eq('Authentication successful')
       end
 
       it 'handles SQL injection attempts' do
         post '/auths', params: { email: "'; DROP TABLE users; --", password: 'password123' }
 
         expect(response).to have_http_status(:unauthorized)
-        
+
         response_body = JSON.parse(response.body)
         expect(response_body['error']).to eq('Invalid email or password')
       end
@@ -163,7 +165,7 @@ RSpec.describe 'Auths', type: :request do
         post '/auths', params: valid_params
 
         expect(response).to have_http_status(:internal_server_error)
-        
+
         response_body = JSON.parse(response.body)
         expect(response_body['error']).to eq('Authentication failed')
         expect(response_body['message']).to eq('Authentication failed')
@@ -202,7 +204,7 @@ RSpec.describe 'Auths', type: :request do
         delete '/auths', headers: { 'Authorization' => "Bearer #{valid_token}" }
 
         expect(response).to have_http_status(:ok)
-        
+
         response_body = JSON.parse(response.body)
         expect(response_body).to have_key('message')
         expect(response_body['message']).to eq('Logout successful')
@@ -249,7 +251,7 @@ RSpec.describe 'Auths', type: :request do
         delete '/auths', headers: { 'Authorization' => "Bearer #{valid_token}" }
 
         expect(response).to have_http_status(:unprocessable_entity)
-        
+
         response_body = JSON.parse(response.body)
         expect(response_body['error']).to eq('Logout failed')
         expect(response_body['message']).to eq('Authentication failed')

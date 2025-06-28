@@ -2,15 +2,26 @@ class AuthsController < ApplicationController
   before_action :authenticate_user!, only: :destroy
 
   def create
-    user = User.where(email: auth_params[:email]).first
-    
-    if user&.authenticate(auth_params[:password])
-      render json: success_response(user), status: :ok
-    else
-      render json: error_response('Invalid email or password'), status: :unauthorized
+    # Validate required parameters first
+    unless auth_params[:email].present? && auth_params[:password].present?
+      return render json: error_response('Email and password are required'), status: :unauthorized
     end
-  rescue StandardError => e
-    render json: error_response('Authentication failed'), status: :internal_server_error
+
+    begin
+      # Find user with case-insensitive email and trimmed whitespace for better UX
+      # Use .where.first instead of .find_by to avoid DocumentNotFound exception
+      user = User.where(email: auth_params[:email].strip.downcase).first
+
+      if user&.authenticate(auth_params[:password])
+        render json: success_response(user), status: :ok
+      else
+        render json: error_response('Invalid email or password'), status: :unauthorized
+      end
+    rescue StandardError => e
+      Rails.logger.error "Authentication error: #{e.message}"
+      Rails.logger.error e.backtrace.join("\n")
+      render json: error_response('Authentication failed'), status: :internal_server_error
+    end
   end
 
   def destroy
