@@ -127,30 +127,47 @@ RSpec.describe Message, type: :model do
       user = create(:user)
       message1 = create(:message, user: user)
       message2 = create(:message, user: user)
-      
+
       expect(user.messages.count).to eq(2)
       expect(user.messages).to include(message1, message2)
     end
   end
 
   describe 'data validation and edge cases' do
-    it 'allows empty body' do
+    it 'rejects empty body' do
       message = build(:message, body: "")
-      expect(message).to be_valid
+      expect(message).not_to be_valid
+      expect(message.errors[:body]).to include("can't be blank")
     end
 
-    it 'allows nil body' do
+    it 'rejects nil body' do
       message = build(:message, body: nil)
-      expect(message).to be_valid
+      expect(message).not_to be_valid
+      expect(message.errors[:body]).to include("can't be blank")
     end
 
-    it 'allows empty to field' do
+    it 'rejects empty to field' do
       message = build(:message, to: "")
-      expect(message).to be_valid
+      expect(message).not_to be_valid
+      expect(message.errors[:to]).to include("can't be blank")
     end
 
-    it 'allows nil to field' do
+    it 'rejects nil to field' do
       message = build(:message, to: nil)
+      expect(message).not_to be_valid
+      expect(message.errors[:to]).to include("can't be blank")
+    end
+
+    it 'rejects message body that is too long' do
+      long_body = 'A' * 1601
+      message = build(:message, body: long_body)
+      expect(message).not_to be_valid
+      expect(message.errors[:body]).to include("is too long (maximum is 1600 characters)")
+    end
+
+    it 'accepts message body at maximum length' do
+      max_length_body = 'A' * 1600
+      message = build(:message, body: max_length_body)
       expect(message).to be_valid
     end
 
@@ -160,11 +177,20 @@ RSpec.describe Message, type: :model do
       expect(message.body).to eq(special_body)
     end
 
-    it 'handles international phone numbers' do
-      international_numbers = ["+44 7911 123456", "+81-90-1234-5678", "+55 11 99999-9999"]
-      international_numbers.each do |number|
-        message = create(:message, to: number)
-        expect(message.to).to eq(number)
+    it 'handles valid international phone numbers' do
+      valid_numbers = ["+1234567890", "+447911123456", "+819012345678", "+5511999999999"]
+      valid_numbers.each do |number|
+        message = build(:message, to: number)
+        expect(message).to be_valid, "Expected #{number} to be valid"
+      end
+    end
+
+    it 'rejects invalid phone number formats' do
+      invalid_numbers = ["123-456-7890", "invalid", "+", "123", "", "+123", "1234567890"]
+      invalid_numbers.each do |number|
+        message = build(:message, to: number)
+        expect(message).not_to be_valid, "Expected #{number} to be invalid"
+        expect(message.errors[:to]).to include("must be a valid phone number")
       end
     end
   end
@@ -204,11 +230,11 @@ RSpec.describe Message, type: :model do
   end
 
   describe 'performance and memory' do
-    it 'can handle creating many messages without memory issues' do 
+    it 'can handle creating many messages without memory issues' do
       expect {
         create_list(:message, 100)
       }.not_to raise_error
-      
+
       expect(Message.count).to eq(100)
     end
   end
