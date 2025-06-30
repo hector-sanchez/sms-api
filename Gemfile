@@ -16,6 +16,8 @@ group :development, :test do
   gem 'dotenv-rails'
   gem "brakeman", require: false
   gem "rubocop-rails-omakase", require: false
+  gem "pry"
+  gem "pry-rails"
 end
 
 group :test do
