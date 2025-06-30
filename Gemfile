@@ -4,7 +4,7 @@ gem "bcrypt"
 gem "bootsnap", require: false
 gem "jwt"
 gem "kamal", require: false
-gem "mongoid", "~> 8.1"
+gem "mongoid", "~> 9.0"
 gem "puma", ">= 5.0"
 gem "rack-cors"
 gem "rails", "~> 8.0.2"
