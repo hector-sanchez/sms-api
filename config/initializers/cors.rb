@@ -8,8 +8,11 @@
 Rails.application.config.middleware.insert_before 0, Rack::Cors do
   allow do
     if Rails.env.development?
-      # Allow all origins in development for easier testing
-      origins '*'
+      # Allow common development origins
+      origins 'localhost:3000', 'localhost:3001', 'localhost:8080', 'localhost:8000',
+              '127.0.0.1:3000', '127.0.0.1:3001', '127.0.0.1:8080', '127.0.0.1:8000',
+              /\Ahttp:\/\/localhost:\d+\z/,
+              /\Ahttp:\/\/127\.0\.0\.1:\d+\z/
     else
       # In production, only allow specific domains
       origins ENV['FRONTEND_URL'] || 'https://yourdomain.com',
