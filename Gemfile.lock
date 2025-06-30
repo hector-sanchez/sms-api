@@ -159,11 +159,10 @@ GEM
     mongo (2.21.1)
       base64
       bson (>= 4.14.1, < 6.0.0)
-    mongoid (8.1.10)
+    mongoid (9.0.6)
       activemodel (>= 5.1, < 8.1, != 7.0.0)
       concurrent-ruby (>= 1.0.5, < 2.0)
       mongo (>= 2.18.0, < 3.0.0)
-      ruby2_keywords (~> 0.0.5)
     mongoid-compatibility (1.0.0)
       activesupport
       mongoid (>= 2.0)
@@ -316,7 +315,6 @@ GEM
       rubocop-performance (>= 1.24)
       rubocop-rails (>= 2.30)
     ruby-progressbar (1.13.0)
-    ruby2_keywords (0.0.5)
     securerandom (0.4.1)
     sshkit (1.24.0)
       base64
@@ -371,7 +369,7 @@ DEPENDENCIES
   faker
   jwt
   kamal
-  mongoid (~> 8.1)
+  mongoid (~> 9.0)
   mongoid-rspec
   pry
   pry-rails
