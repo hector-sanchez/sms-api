@@ -19,7 +19,7 @@ RSpec.describe 'Users', type: :request do
     before do
       # Clear database
       User.delete_all
-      
+
       # Mock environment variable for JWT
       allow(ENV).to receive(:[]).and_call_original
       allow(ENV).to receive(:[]).with('JWT_SECRET').and_return('test_secret_key')
@@ -32,7 +32,7 @@ RSpec.describe 'Users', type: :request do
         }.to change(User, :count).by(1)
 
         expect(response).to have_http_status(:created)
-        
+
         response_body = JSON.parse(response.body)
         expect(response_body).to have_key('token')
         expect(response_body).to have_key('user')
@@ -74,6 +74,37 @@ RSpec.describe 'Users', type: :request do
         expect(user.token_version).to be_present
         expect(user.token_version).to be_a(Integer)
       end
+
+      it 'auto-authenticates user after successful registration' do
+        post '/users', params: valid_params
+
+        expect(response).to have_http_status(:created)
+        response_body = JSON.parse(response.body)
+
+        # Should include authentication token (auto-login)
+        expect(response_body['token']).to be_present
+        expect(response_body['user']).to be_present
+        expect(response_body['message']).to eq('User created successfully')
+
+        # Token should be valid and contain user info
+        decoded_payload = JwtService.decode(response_body['token'])
+        user = User.last
+        expect(decoded_payload[:user_id]).to eq(user.id.to_s)
+      end
+
+      it 'normalizes email address during registration' do
+        params = { email: '  TEST@Example.COM  ', password: 'password123' }
+
+        post '/users', params: params
+
+        expect(response).to have_http_status(:created)
+        user = User.last
+        expect(user.email).to eq('test@example.com')
+
+        # Response should show normalized email
+        response_body = JSON.parse(response.body)
+        expect(response_body['user']['email']).to eq('test@example.com')
+      end
     end
 
     context 'with invalid parameters' do
@@ -83,7 +114,7 @@ RSpec.describe 'Users', type: :request do
         }.not_to change(User, :count)
 
         expect(response).to have_http_status(:unprocessable_entity)
-        
+
         response_body = JSON.parse(response.body)
         expect(response_body).to have_key('errors')
         expect(response_body).to have_key('message')
@@ -97,7 +128,7 @@ RSpec.describe 'Users', type: :request do
         }.not_to change(User, :count)
 
         expect(response).to have_http_status(:unprocessable_entity)
-        
+
         response_body = JSON.parse(response.body)
         expect(response_body).to have_key('errors')
         expect(response_body).to have_key('message')
@@ -111,7 +142,7 @@ RSpec.describe 'Users', type: :request do
         }.not_to change(User, :count)
 
         expect(response).to have_http_status(:unprocessable_entity)
-        
+
         response_body = JSON.parse(response.body)
         expect(response_body).to have_key('errors')
         expect(response_body).to have_key('message')
@@ -128,11 +159,45 @@ RSpec.describe 'Users', type: :request do
         }.not_to change(User, :count)
 
         expect(response).to have_http_status(:unprocessable_entity)
-        
+
         response_body = JSON.parse(response.body)
         expect(response_body).to have_key('errors')
         expect(response_body).to have_key('message')
         expect(response_body['message']).to eq('User creation failed')
+        expect(response_body['errors']).to include('Email has already been taken')
+      end
+
+      it 'does not create a user with invalid email format' do
+        invalid_emails = [
+          'plainaddress',           # No @ symbol
+          '@missing-local.com',     # Missing local part
+          'missing@domain',         # Missing TLD
+          'spaces @domain.com'      # Invalid characters
+        ]
+
+        invalid_emails.each do |invalid_email|
+          expect {
+            post '/users', params: { email: invalid_email, password: 'password123' }
+          }.not_to change(User, :count)
+
+          expect(response).to have_http_status(:unprocessable_entity)
+
+          response_body = JSON.parse(response.body)
+          expect(response_body['errors']).to include('Email must be a valid email address')
+        end
+      end
+
+      it 'does not create user with case-insensitive duplicate email' do
+        # Create a user with lowercase email
+        User.create!(email: 'test@example.com', password: 'password123')
+
+        # Try to create another user with uppercase email
+        expect {
+          post '/users', params: { email: 'TEST@EXAMPLE.COM', password: 'password123' }
+        }.not_to change(User, :count)
+
+        expect(response).to have_http_status(:unprocessable_entity)
+        response_body = JSON.parse(response.body)
         expect(response_body['errors']).to include('Email has already been taken')
       end
     end
@@ -141,7 +206,7 @@ RSpec.describe 'Users', type: :request do
       it 'handles special characters in email' do
         special_email = 'user+test@example-domain.co.uk'
         params = { email: special_email, password: 'password123' }
-        
+
         post '/users', params: params
 
         expect(response).to have_http_status(:created)
@@ -151,7 +216,7 @@ RSpec.describe 'Users', type: :request do
       it 'handles very long emails' do
         long_email = "#{'a' * 50}@example.com"
         params = { email: long_email, password: 'password123' }
-        
+
         post '/users', params: params
 
         expect(response).to have_http_status(:created)
@@ -160,12 +225,12 @@ RSpec.describe 'Users', type: :request do
 
       it 'handles short password length' do
         params = { email: 'test@example.com', password: 'ab' }
-        
+
         post '/users', params: params
 
         # Password validation depends on Rails configuration
         expect(response).to have_http_status(:created).or have_http_status(:unprocessable_entity)
-        
+
         if response.status == 422
           response_body = JSON.parse(response.body)
           expect(response_body['errors']).to be_present
@@ -175,7 +240,7 @@ RSpec.describe 'Users', type: :request do
       it 'handles maximum email length gracefully' do
         very_long_email = "#{'a' * 200}@example.com"
         params = { email: very_long_email, password: 'password123' }
-        
+
         post '/users', params: params
 
         # Should either succeed or fail gracefully
@@ -205,7 +270,12 @@ RSpec.describe 'Users', type: :request do
 
         expect {
           post '/users', params: valid_params
-        }.to raise_error(StandardError, 'JWT encoding failed')
+        }.to change(User, :count).by(1)  # User is still created
+
+        expect(response).to have_http_status(:internal_server_error)
+        response_body = JSON.parse(response.body)
+        expect(response_body['errors']).to include('User creation failed')
+        expect(response_body['message']).to eq('Registration failed')
       end
     end
   end

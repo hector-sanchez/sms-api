@@ -1,12 +1,15 @@
 class UsersController < ApplicationController
   def create
     user = User.new(user_params)
-    
+
     if user.save
+      # Auto-authenticate the user after successful registration
       render json: success_response(user), status: :created
     else
       render json: error_response(user), status: :unprocessable_entity
     end
+  rescue StandardError => e
+    render json: { errors: ['User creation failed'], message: 'Registration failed' }, status: :internal_server_error
   end
 
   private
