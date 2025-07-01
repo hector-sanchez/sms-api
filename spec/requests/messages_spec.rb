@@ -60,7 +60,7 @@ RSpec.describe 'Messages', type: :request do
         first_message = messages.first
         expect(first_message).to have_key('id')
         expect(first_message).to have_key('body')
-        expect(first_message).to have_key('to')
+        expect(first_message).to have_key('phone_number')
         expect(first_message).to have_key('status')
         expect(first_message).to have_key('created_at')
         expect(first_message).to have_key('updated_at')
@@ -165,7 +165,7 @@ RSpec.describe 'Messages', type: :request do
 
         message_data = response_body['message']
         expect(message_data['body']).to eq('Hello from test!')
-        expect(message_data['to']).to eq('+1234567890')
+        expect(message_data['phone_number']).to eq('+1234567890')
         expect(message_data['status']).to eq('queued')
         expect(message_data['twilio_sid']).to eq('SM1234567890abcdef')
 

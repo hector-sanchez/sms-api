@@ -129,7 +129,7 @@ curl -X POST http://localhost:3000/messages \
   "message": {
     "id": "507f1f77bcf86cd799439012",
     "body": "Hello from SMS API!",
-    "to": "+1234567890",
+    "phone_number": "+1234567890",
     "status": "queued",
     "twilio_sid": "SM1234567890abcdef",
     "created_at": "2025-06-28T10:30:00.000Z",
@@ -154,7 +154,7 @@ curl -X GET http://localhost:3000/users/USER_ID/messages \
     {
       "id": "507f1f77bcf86cd799439012",
       "body": "Hello from SMS API!",
-      "to": "+1234567890",
+      "phone_number": "+1234567890",
       "status": "delivered",
       "created_at": "2025-06-28T10:30:00.000Z",
       "updated_at": "2025-06-28T10:30:00.000Z"

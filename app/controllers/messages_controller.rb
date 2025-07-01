@@ -144,7 +144,7 @@ class MessagesController < ApplicationController
     {
       id: message.id.to_s,
       body: message.body,
-      to: message.to,
+      phone_number: message.to,
       status: message.status,
       twilio_sid: message.twilio_sid,
       created_at: message.created_at,
