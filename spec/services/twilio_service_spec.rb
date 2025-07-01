@@ -12,7 +12,7 @@ RSpec.describe TwilioService do
       allow(ENV).to receive(:[]).and_call_original
       allow(ENV).to receive(:[]).with('TWILIO_ACCOUNT_SID').and_return('test_account_sid')
       allow(ENV).to receive(:[]).with('TWILIO_AUTH_TOKEN').and_return('test_auth_token')
-      allow(ENV).to receive(:[]).with('TWILIO_PHONE_NUMBER').and_return('+1987654321')
+      allow(ENV).to receive(:[]).with('TWILIO_FROM_PHONE_NUMBER').and_return('+1987654321')
 
       # Mock Twilio client initialization
       allow(Twilio::REST::Client).to receive(:new).and_return(twilio_client)
@@ -144,7 +144,7 @@ RSpec.describe TwilioService do
       end
 
       it 'raises TwilioError when phone number is missing' do
-        allow(ENV).to receive(:[]).with('TWILIO_PHONE_NUMBER').and_return(nil)
+        allow(ENV).to receive(:[]).with('TWILIO_FROM_PHONE_NUMBER').and_return(nil)
         allow(messages_client).to receive(:create) # This won't be reached due to validation
 
         expect {
@@ -231,7 +231,7 @@ RSpec.describe TwilioService do
         allow(ENV).to receive(:[]).and_call_original
         allow(ENV).to receive(:[]).with('TWILIO_ACCOUNT_SID').and_return(nil)
         allow(ENV).to receive(:[]).with('TWILIO_AUTH_TOKEN').and_return(nil)
-        allow(ENV).to receive(:[]).with('TWILIO_PHONE_NUMBER').and_return(nil)
+        allow(ENV).to receive(:[]).with('TWILIO_FROM_PHONE_NUMBER').and_return(nil)
 
         # Don't mock the Twilio client creation for this test
         allow(Twilio::REST::Client).to receive(:new).and_call_original
@@ -285,7 +285,7 @@ RSpec.describe TwilioService do
 
         expect(ENV).to have_received(:[]).with('TWILIO_ACCOUNT_SID')
         expect(ENV).to have_received(:[]).with('TWILIO_AUTH_TOKEN')
-        expect(ENV).to have_received(:[]).with('TWILIO_PHONE_NUMBER')
+        expect(ENV).to have_received(:[]).with('TWILIO_FROM_PHONE_NUMBER')
       end
     end
   end

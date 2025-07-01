@@ -33,7 +33,7 @@ RSpec.describe 'Messages', type: :request do
     allow(ENV).to receive(:[]).with('JWT_SECRET').and_return('test_secret_key')
     allow(ENV).to receive(:[]).with('TWILIO_ACCOUNT_SID').and_return('test_sid')
     allow(ENV).to receive(:[]).with('TWILIO_AUTH_TOKEN').and_return('test_token')
-    allow(ENV).to receive(:[]).with('TWILIO_PHONE_NUMBER').and_return('+1234567890')
+    allow(ENV).to receive(:[]).with('TWILIO_FROM_PHONE_NUMBER').and_return('+1234567890')
   end
 
   describe 'GET /users/:user_id/messages' do
