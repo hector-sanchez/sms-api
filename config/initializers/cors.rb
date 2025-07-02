@@ -14,8 +14,9 @@ Rails.application.config.middleware.insert_before 0, Rack::Cors do
               /\Ahttp:\/\/localhost:\d+\z/,
               /\Ahttp:\/\/127\.0\.0\.1:\d+\z/
     else
-      # In production, only allow specific domains
-      origins ENV['FRONTEND_URL'] || 'https://yourdomain.com',
+      # In production, allow your Heroku domain and any frontend domains
+      origins 'https://sms-api-1751415465-612b91c224a7.herokuapp.com',
+              ENV['FRONTEND_URL'] || 'https://yourdomain.com',
               ENV['ADMIN_URL'] || 'https://admin.yourdomain.com'
               # Add more specific domains as needed
     end

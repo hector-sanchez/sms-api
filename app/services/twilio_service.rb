@@ -41,7 +41,7 @@ class TwilioService
   end
 
   def self.send_message(client, to:, body:)
-    from_number = ENV['TWILIO_FROM_PHONE_NUMBER']
+    from_number = ENV['TWILIO_PHONE_NUMBER'] || ENV['TWILIO_FROM_PHONE_NUMBER']
     raise TwilioError, "Twilio phone number not configured" if from_number.blank?
 
     client.messages.create(
