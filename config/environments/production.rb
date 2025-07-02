@@ -74,4 +74,10 @@ Rails.application.configure do
   #
   # Skip DNS rebinding protection for the default health check endpoint.
   config.host_authorization = { exclude: ->(request) { request.path == "/up" } }
+
+  # Memory optimization for Heroku
+  config.cache_store = :memory_store, { size: 32.megabytes }
+  
+  # Reduce logging verbosity in production
+  config.log_level = :warn
 end
