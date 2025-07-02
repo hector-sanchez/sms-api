@@ -1,0 +1,65 @@
+# Name of your application. Used to uniquely configure containers.
+service: sms-api
+
+# Name of the container image.
+image: sms-api
+
+# Deploy to these servers.
+servers:
+  web:
+    - YOUR_SERVER_IP
+
+# Credentials for your image host.
+registry:
+  # server: registry.digitalocean.com # Use DigitalOcean Container Registry
+  username: your_registry_username
+  
+  # Always use an access token rather than real password when possible.
+  password:
+    - KAMAL_REGISTRY_PASSWORD
+
+# Inject ENV variables into containers (secrets come from .env file).
+env:
+  clear:
+    RAILS_LOG_LEVEL: info
+  secret:
+    - JWT_SECRET
+    - MONGODB_ATLAS_URI
+    - TWILIO_ACCOUNT_SID
+    - TWILIO_AUTH_TOKEN
+    - TWILIO_PHONE_NUMBER
+
+# Use a different ssh user than root
+ssh:
+  user: deploy
+
+# Configure builder setup.
+builder:
+  args:
+    RUBY_VERSION: 3.4.4
+
+# Use accessory services (secrets come from .env file).
+# accessories:
+#   db:
+#     image: mongo:6.0
+#     host: YOUR_DB_SERVER_IP
+#     env:
+#       secret:
+#         - MONGO_INITDB_ROOT_PASSWORD
+#     files:
+#       - config/init.js:/docker-entrypoint-initdb.d/init.js
+#     directories:
+#       - data:/data/db
+
+# Configure custom arguments for Traefik. Be sure to reboot traefik when you modify this.
+# traefik:
+#   args:
+#     accesslog: true
+#     accesslog.format: json
+
+# Configure a custom healthcheck (default is /up on port 3000)
+# healthcheck:
+#   path: /up
+#   port: 3000
+#   max_attempts: 7
+#   interval: 20s
