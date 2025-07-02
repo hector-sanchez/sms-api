@@ -78,6 +78,6 @@ Rails.application.configure do
   # Memory optimization for Heroku
   config.cache_store = :memory_store, { size: 32.megabytes }
   
-  # Reduce logging verbosity in production
-  config.log_level = :warn
+  # Set logging level to see debug information
+  config.log_level = :info
 end

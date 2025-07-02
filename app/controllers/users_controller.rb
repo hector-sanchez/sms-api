@@ -9,6 +9,8 @@ class UsersController < ApplicationController
       render json: error_response(user), status: :unprocessable_entity
     end
   rescue StandardError => e
+    Rails.logger.error "User creation error: #{e.message}"
+    Rails.logger.error "Backtrace: #{e.backtrace.first(5).join("\n")}"
     render json: { errors: ['User creation failed'], message: 'Registration failed' }, status: :internal_server_error
   end
 
