@@ -13,7 +13,7 @@ servers:
 registry:
   # server: registry.digitalocean.com # Use DigitalOcean Container Registry
   username: your_registry_username
-  
+
   # Always use an access token rather than real password when possible.
   password:
     - KAMAL_REGISTRY_PASSWORD
