@@ -332,7 +332,7 @@ GEM
     thruster (0.1.14-arm64-darwin)
     thruster (0.1.14-x86_64-linux)
     timeout (0.4.3)
-    twilio-ruby (7.6.3)
+    twilio-ruby (7.6.4)
       faraday (>= 0.9, < 3.0)
       jwt (>= 1.5, < 3.0)
       nokogiri (>= 1.6, < 2.0)
