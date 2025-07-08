@@ -68,8 +68,9 @@ Rails.application.configure do
 
   # Enable DNS rebinding protection and other `Host` header attacks.
   config.hosts = [
-    "sms-api-1751415465-612b91c224a7.herokuapp.com", # Your Heroku domain
-    /.*\.herokuapp\.com/                               # Allow all Heroku domains
+    "sms-api-production-1605.up.railway.app",
+    /.*\.railway\.app$/,
+    /.*\.up\.railway\.app$/
   ]
   #
   # Skip DNS rebinding protection for the default health check endpoint.
@@ -77,7 +78,7 @@ Rails.application.configure do
 
   # Memory optimization for Heroku
   config.cache_store = :memory_store, { size: 32.megabytes }
-  
+
   # Set logging level to see debug information
   config.log_level = :info
 end
