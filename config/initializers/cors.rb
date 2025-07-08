@@ -11,6 +11,7 @@ Rails.application.config.middleware.insert_before 0, Rack::Cors do
       # Allow common development origins
       origins 'localhost:3000', 'localhost:3001', 'localhost:8080', 'localhost:8000',
               '127.0.0.1:3000', '127.0.0.1:3001', '127.0.0.1:8080', '127.0.0.1:8000',
+              '127.0.0.1:4200',
               /\Ahttp:\/\/localhost:\d+\z/,
               /\Ahttp:\/\/127\.0\.0\.1:\d+\z/
     else

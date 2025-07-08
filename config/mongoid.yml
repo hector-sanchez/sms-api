@@ -15,14 +15,13 @@ test:
 production:
   clients:
     default:
-      uri: <%= ENV['MONGODB_ATLAS_URI'] %>
-      options:
-        ssl: true
-        ssl_verify: false
-        connect_timeout: 30
-        socket_timeout: 30
-        wait_queue_timeout: 30
-        max_pool_size: 5
-        min_pool_size: 1
+      uri: <%= ENV['MONGO_URL'] || ENV['DATABASE_URL'] || ENV['MONGODB_ATLAS_URI'] %>
   options:
     use_activesupport_time_zone: true
+    ssl: true
+    # ssl_verify: false
+    # connect_timeout: 30
+    # socket_timeout: 30
+    # wait_queue_timeout: 30
+    # max_pool_size: 5
+    # min_pool_size: 1
