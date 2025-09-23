@@ -7,7 +7,7 @@ gem "kamal", require: false
 gem "mongoid", "~> 8.1"
 gem "puma", ">= 5.0"
 gem "rack-cors"
-gem "rails", "~> 8.0.2"
+gem "rails", "~> 8.0.3"
 gem "thruster", require: false
 gem "twilio-ruby"
 gem "tzinfo-data", platforms: %i[ windows jruby ]
